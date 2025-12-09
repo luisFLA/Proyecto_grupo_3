@@ -11,12 +11,23 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       const res = await login({ correo, contrasenia });
-      localStorage.setItem("token", res.data.token);
-      navigate("/");
+      console.log("Respuesta login:", res.data);
+
+      // Aseguramos que venga el token
+      if (res.data && res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        // Navegamos al dashboard
+        navigate("/");
+      } else {
+        setError("Respuesta inválida del servidor (sin token).");
+      }
     } catch (err) {
-      setError("Credenciales incorrectas");
+      console.log("Error login:", err.response?.data || err);
+      const msg = err.response?.data?.message || "Error al iniciar sesión";
+      setError(msg);
     }
   };
 
